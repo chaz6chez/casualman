@@ -1,0 +1,21 @@
+{
+  "name": "chaz6chez/something",
+  "description": "一些学习或者工作中会遇到的问题",
+  "require": {
+    "php": ">=7.2.0",
+    "ext-json": "*",
+    "ext-bcmath": "*"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "chaz6chez",
+      "email": "admin@chaz6chez.cn"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Chaz\\": "lib/"
+    }
+  }
+}
