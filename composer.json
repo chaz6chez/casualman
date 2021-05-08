@@ -2,20 +2,20 @@
   "name": "chaz6chez/something",
   "description": "一些学习或者工作中会遇到的问题",
   "require": {
-    "php": ">=7.2.0",
-    "ext-json": "*",
-    "ext-bcmath": "*"
+    "php": ">=7.2",
+    "ext-pdo": "*",
+    "casual/framework": "^0.0.1"
   },
   "license": "MIT",
   "authors": [
     {
       "name": "chaz6chez",
-      "email": "admin@chaz6chez.cn"
+      "email": "250220719@qq.com"
     }
   ],
   "autoload": {
     "psr-4": {
-      "Chaz\\": "lib/"
+      "CasualMan\\" : "src"
     }
   }
 }
