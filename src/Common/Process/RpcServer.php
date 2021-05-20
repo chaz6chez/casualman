@@ -82,6 +82,7 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
                 self::$_jsonFormat->id ? 'normal' : 'notice',
                 self::$_jsonFormat->method
             )){
+                dump(self::$_jsonFormat->result);
                 $this->_error(new ServerErrorException(), '500 SERVER ERROR');
                 return;
             }

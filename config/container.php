@@ -1,2 +1,2 @@
 <?php
-return Kernel\Container::instance();
+return \Kernel\Container::instance();

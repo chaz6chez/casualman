@@ -9,9 +9,9 @@ class DemoMid implements MiddlewareInterface {
 
     public function process(\Closure $next, ...$param)
     {
-        var_dump('before' . PHP_EOL);
+        dump(__CLASS__ . '::before');
         $res = callback($next, ...$param);
-        var_dump('after' . PHP_EOL);
+        dump(__CLASS__ . '::after');
         return $res;
     }
 }

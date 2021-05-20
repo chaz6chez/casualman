@@ -1,6 +1,6 @@
 {
   "name": "casual/casualman",
-  "description": "一些学习或者工作中会遇到的问题",
+  "description": "Low performance Service Framework for PHP based on Workerman.",
   "require": {
     "php": ">=7.2",
     "ext-pdo": "*",
@@ -8,7 +8,7 @@
     "sanyateam/3y-jsonrpc-server": "0.*",
     "sanyateam/3y-jsonrpc-client": "0.*",
     "symfony/var-dumper": "^5.2",
-    "casual/database": "^0.01.0"
+    "casual/database": "dev-main"
   },
   "license": "MIT",
   "authors": [
