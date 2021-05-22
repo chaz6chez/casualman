@@ -1,4 +1,5 @@
 **<center>This frame has dedicated my dear pet , Bunny Nuomi</center>**
+
 **<center><谨以此框架献给我亲爱的宠物，兔子糯米></center>**
 
 # Casual Man <草率之人>
