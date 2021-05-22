@@ -13,5 +13,5 @@ return [
         'count'      => 4,
         'reuse_port' => true,
         'reloadable' => true
-    ],
+    ]
 ];

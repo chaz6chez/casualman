@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Controller;
+namespace CasualMan\Demo\Controller;
 
-use CasualMan\Clearing\Service\DemoService;
+use CasualMan\Demo\Service\DemoService;
 
 class Demo {
     public function demo() : string {

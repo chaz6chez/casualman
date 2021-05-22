@@ -21,5 +21,10 @@
     "psr-4": {
       "CasualMan\\" : "src"
     }
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "@php -r \"file_exists('bin/.env') || copy('.env.example', 'bin/.env');\""
+    ]
   }
 }

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Middleware;
+namespace CasualMan\Demo\Middleware;
 
 use Kernel\Protocols\MiddlewareInterface;
 

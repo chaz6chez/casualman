@@ -1,6 +1,6 @@
 <?php
 \Kernel\Router::addRoute(['notice', 'normal'],'@demo', [
-    new \CasualMan\Clearing\Controller\Demo() , 'demo']
+    new \CasualMan\Demo\Controller\Demo() , 'demo']
 )->middlewares([
-    \CasualMan\Clearing\Middleware\DemoMid::class
+    \CasualMan\Demo\Middleware\DemoMid::class
 ]);
