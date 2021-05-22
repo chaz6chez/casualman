@@ -1,10 +1,20 @@
+**This frame has dedicated my dear pet , Bunny Nuomi**
+
+**谨以此框架献给我亲爱的宠物，兔子糯米**
+
 # Casual Man <草率之人>
 
+***
+![](https://img.shields.io/github/issues/Chaz6Chez/casualman)
+![](https://img.shields.io/github/forks/Chaz6Chez/casualman)
+![](https://img.shields.io/github/stars/Chaz6Chez/casualman)
+![](https://img.shields.io/github/license/Chaz6Chez/casualman)
+[![Latest Unstable Version](https://poser.pugx.org/casual/framework/v/unstable)](//packagist.org/packages/casual/framework)
+
+## 介绍
 - Low performance Service Framework Component for PHP based on Workerman.
 - 基于Workerman的低性能PHP服务框架。
-
-# 结构说明
-
+## 结构
 ~~~
 |-- bin <启动器>
     |-- app.php
