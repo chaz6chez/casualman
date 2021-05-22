@@ -12,7 +12,6 @@ use JsonRpcServer\Format\JsonFmt;
 use Kernel\AbstractProcess;
 use Kernel\Protocols\ListenerInterface;
 use Kernel\Router;
-use Protocols\JsonRpc2;
 use Workerman\Connection\TcpConnection;
 
 class RpcServer extends AbstractProcess implements ListenerInterface{
