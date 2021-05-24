@@ -46,6 +46,7 @@
 |-- README.md
 ~~~
 ## 使用
+- 以1.0.0版本举例
 ~~~
     composer create-project casual/casualman 你的项目名称 1.0.0
 ~~~
