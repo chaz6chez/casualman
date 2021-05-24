@@ -15,7 +15,6 @@ use Kernel\Router;
 use Workerman\Connection\TcpConnection;
 
 class RpcServer extends AbstractProcess implements ListenerInterface{
-
     /**
      * @var TcpConnection
      */
@@ -44,27 +43,14 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
         self::$_debug = $debug;
     }
 
-    public function onStart(...$param): void {
-        //TODO 日志系统服务的连接创建
-    }
+    public function onStart(...$param): void {} //TODO 资源初始化
     public function onReload(...$param): void {}
-    public function onStop(...$param): void {
-        //TODO 日志系统服务的连接销毁
-    }
-
-    public function onBufferDrain(...$params) : void{
-        //TODO 记录日志
-    }
-    public function onBufferFull(...$params) : void{
-        //TODO 记录日志
-    }
+    public function onStop(...$param): void {} //TODO 资源释放
+    public function onBufferDrain(...$params) : void {} //TODO 记录日志
+    public function onBufferFull(...$params) : void {} //TODO 记录日志
     public function onClose(...$params) : void {}
     public function onConnect(...$params) : void {}
-
-    public function onError(...$params) : void
-    {
-        //TODO 记录日志
-    }
+    public function onError(...$params) : void {} //TODO 记录日志
 
     public function onMessage(...$params) : void {
         self::_analysis(...$params);
@@ -127,13 +113,13 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
         $errorFmt->data = $info ?? null;
         self::$_jsonFormat->error = $errorFmt->outputArray($errorFmt::FILTER_STRICT);
         if(!self::connection()->send(self::$_jsonFormat->outputArrayByKey(true, self::$_jsonFormat::TYPE_RESPONSE))){
-            //TODO 发送失败处理
+            self::log('Failed to send error message  ' . self::$_jsonFormat->id);
         }
     }
     
     protected function _success(?array $buffer) : void{
         if(!self::connection()->send($buffer)){
-            //TODO 发送失败处理
+            self::log('Failed to send success message  ' . self::$_jsonFormat->id);
         }
     }
 }
