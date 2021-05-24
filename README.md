@@ -9,7 +9,7 @@
 ![](https://img.shields.io/github/forks/Chaz6Chez/casualman)
 ![](https://img.shields.io/github/stars/Chaz6Chez/casualman)
 ![](https://img.shields.io/github/license/Chaz6Chez/casualman)
-[![Latest Unstable Version](https://poser.pugx.org/casual/framework/v/unstable)](//packagist.org/packages/casual/framework)
+![](https://poser.pugx.org/casual/framework/v/stable)
 
 ## 介绍
 - Low performance Service Framework Component for PHP based on Workerman.
