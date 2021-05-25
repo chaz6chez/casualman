@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace CasualMan\Common\Process;
 
-use CasualMan\Common\Internal\JsonRpc2\Exception\MethodNotFoundException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\RpcException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\ServerErrorException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\ServiceErrorException;
-use CasualMan\Common\Internal\JsonRpc2\Format\ErrorFmt;
-use CasualMan\Common\Internal\JsonRpc2\Format\JsonFmt;
+use Protocols\JsonRpc2;
+use Utils\JsonRpc2\Exception\MethodNotFoundException;
+use Utils\JsonRpc2\Exception\RpcException;
+use Utils\JsonRpc2\Exception\ServerErrorException;
+use Utils\JsonRpc2\Exception\ServiceErrorException;
+use Utils\JsonRpc2\Format\ErrorFmt;
+use Utils\JsonRpc2\Format\JsonFmt;
 use Kernel\AbstractProcess;
 use Kernel\Protocols\ListenerInterface;
 use Kernel\Router;
@@ -83,12 +84,11 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
             $this->_error(new ServerErrorException(), $exception->getPrevious() ?? $exception);
             return;
         }
-
     }
 
     protected static function _analysis(...$params) : void {
         [self::$_connection, $data] = $params;
-        [self::$_exception, $buffer] = (array)$data;
+        [self::$_exception, $buffer] = JsonRpc2::request((array)$data);
         self::$_jsonFormat = JsonFmt::factory((array)$buffer);
         self::$_params = self::$_jsonFormat->params;
     }

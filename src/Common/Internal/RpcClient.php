@@ -1,17 +1,17 @@
 <?php
 
-namespace CasualMan\Common\Internal\JsonRpc2;
+namespace CasualMan\Common\Internal;
 
-use CasualMan\Common\Internal\JsonRpc2\Exception\ConnectException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\InternalErrorException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\InvalidRequestException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\MethodAlreadyException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\MethodNotFoundException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\MethodNotReadyException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\RpcException;
-use CasualMan\Common\Internal\JsonRpc2\Exception\ServerErrorException;
-use CasualMan\Common\Internal\JsonRpc2\Format\ErrorFmt;
-use CasualMan\Common\Internal\JsonRpc2\Format\JsonFmt;
+use Utils\JsonRpc2\Exception\ConnectException;
+use Utils\JsonRpc2\Exception\InternalErrorException;
+use Utils\JsonRpc2\Exception\InvalidRequestException;
+use Utils\JsonRpc2\Exception\MethodAlreadyException;
+use Utils\JsonRpc2\Exception\MethodNotFoundException;
+use Utils\JsonRpc2\Exception\MethodNotReadyException;
+use Utils\JsonRpc2\Exception\RpcException;
+use Utils\JsonRpc2\Exception\ServerErrorException;
+use Utils\JsonRpc2\Format\ErrorFmt;
+use Utils\JsonRpc2\Format\JsonFmt;
 use Protocols\JsonRpc2;
 
 class RpcClient {
@@ -52,15 +52,6 @@ class RpcClient {
         if($address){
             self::$_addressArray = $address;
         }
-        $this->register();
-    }
-
-    /**
-     * 注册异常响应
-     */
-    public function register() {
-        $this->_id = self::uuid();
-        spl_autoload_register([$this, '_autoload']);
     }
 
     /**
@@ -289,15 +280,10 @@ class RpcClient {
         return $res;
     }
 
-    public function unregister() {
-        spl_autoload_unregister([$this, '_autoload']);
-    }
-
     /**
      * 关闭连接
      */
     public function close(){
-        $this->unregister();
         $this->_closeConnection();
     }
 
@@ -311,14 +297,6 @@ class RpcClient {
             $tag,
             $data
         ];
-    }
-
-    /**
-     * @param $class
-     * @throws \Exception
-     */
-    protected function _autoload($class) {
-        throw new \Exception("class {$class} not found",'-1');
     }
 
     /**
