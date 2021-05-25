@@ -4,9 +4,7 @@
   "require": {
     "php": ">=7.2",
     "ext-pdo": "*",
-    "casual/framework": "^1.0",
-    "sanyateam/3y-jsonrpc-server": "0.*",
-    "sanyateam/3y-jsonrpc-client": "0.*",
+    "casual/framework": "^2.0",
     "symfony/var-dumper": "^5.2",
     "casual/database": "^1.0"
   },
