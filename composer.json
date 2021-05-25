@@ -6,7 +6,8 @@
     "ext-pdo": "*",
     "casual/framework": "^2.0",
     "symfony/var-dumper": "^5.2",
-    "casual/database": "^1.0"
+    "casual/database": "^1.0",
+    "chaz6chez/structure": "^1.0"
   },
   "license": "MIT",
   "authors": [
@@ -17,7 +18,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "CasualMan\\" : "src"
+      "CasualMan\\" : "src",
+      "Protocols\\" : "protocols"
     }
   },
   "scripts": {

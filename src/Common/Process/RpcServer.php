@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace CasualMan\Common\Process;
 
-use JsonRpcServer\Exception\MethodNotFoundException;
-use JsonRpcServer\Exception\RpcException;
-use JsonRpcServer\Exception\ServerErrorException;
-use JsonRpcServer\Exception\ServiceErrorException;
-use JsonRpcServer\Format\ErrorFmt;
-use JsonRpcServer\Format\JsonFmt;
+use CasualMan\Common\Internal\JsonRpc2\Exception\MethodNotFoundException;
+use CasualMan\Common\Internal\JsonRpc2\Exception\RpcException;
+use CasualMan\Common\Internal\JsonRpc2\Exception\ServerErrorException;
+use CasualMan\Common\Internal\JsonRpc2\Exception\ServiceErrorException;
+use CasualMan\Common\Internal\JsonRpc2\Format\ErrorFmt;
+use CasualMan\Common\Internal\JsonRpc2\Format\JsonFmt;
 use Kernel\AbstractProcess;
 use Kernel\Protocols\ListenerInterface;
 use Kernel\Router;
@@ -67,7 +67,6 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
                 self::$_jsonFormat->id ? 'normal' : 'notice',
                 self::$_jsonFormat->method
             )){
-                dump(self::$_jsonFormat->result);
                 $this->_error(new ServerErrorException(), '500 SERVER ERROR');
                 return;
             }
