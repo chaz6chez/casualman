@@ -8,7 +8,9 @@ require_once ROOT_PATH . '/vendor/autoload.php';
 use Kernel\ApplicationFactory;
 
 try{
-    (new ApplicationFactory())('Rpc-server','0.0.1')->run();
+    (new ApplicationFactory())('CASUAL-MAN','0.0.1', function(){
+        Co()->get(\Kernel\Middlewares::class)->init('CASUAL-MAN');
+    })->run();
 }catch(Throwable $throwable){
     exit($throwable->getMessage());
 }

@@ -1,0 +1,15 @@
+version: '3'
+services:
+  clearing_center:
+    restart: always
+    container_name: casualman
+    build:
+      context: ./
+    image: casualman
+    ports:
+      - 5454:5454
+      - 6464:6464
+    volumes:
+      - ../casualman:/var/www
+    stdin_open: true
+    tty: true
