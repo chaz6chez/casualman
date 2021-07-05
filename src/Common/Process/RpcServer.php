@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace CasualMan\Common\Process;
 
-use JsonRpcServer\Exception\MethodNotFoundException;
-use JsonRpcServer\Exception\RpcException;
-use JsonRpcServer\Exception\ServerErrorException;
-use JsonRpcServer\Exception\ServiceErrorException;
-use JsonRpcServer\Format\ErrorFmt;
-use JsonRpcServer\Format\JsonFmt;
+use Protocols\JsonRpc2;
+use Utils\JsonRpc2\Exception\MethodNotFoundException;
+use Utils\JsonRpc2\Exception\RpcException;
+use Utils\JsonRpc2\Exception\ServerErrorException;
+use Utils\JsonRpc2\Exception\ServiceErrorException;
+use Utils\JsonRpc2\Format\ErrorFmt;
+use Utils\JsonRpc2\Format\JsonFmt;
 use Kernel\AbstractProcess;
 use Kernel\Protocols\ListenerInterface;
 use Kernel\Router;
@@ -27,20 +28,35 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
      * @var RpcException
      */
     protected static $_exception;
+
     /**
      * @var JsonFmt
      */
     protected static $_jsonFormat;
-    protected static $_debug = false;
 
-    public static function connection() : TcpConnection{
+    /**
+     * @var array
+     */
+    protected static $_data;
+
+    public static function connection() : ?TcpConnection{
         return self::$_connection;
     }
-    public static function params() : array {
+    public static function params() : ?array{
         return self::$_params;
     }
-    public static function debug(bool $debug = false){
-        self::$_debug = $debug;
+
+    /**
+     * @param string|null $key
+     * @param null $default
+     * @return object|array|string|int|null
+     */
+    public static function getData(?string $key = null, $default = null)
+    {
+        if($key) {
+            return isset(self::$_data[$key]) ? self::$_data[$key] : $default;
+        }
+        return self::$_data;
     }
 
     public function onStart(...$param): void {} //TODO 资源初始化
@@ -67,7 +83,6 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
                 self::$_jsonFormat->id ? 'normal' : 'notice',
                 self::$_jsonFormat->method
             )){
-                dump(self::$_jsonFormat->result);
                 $this->_error(new ServerErrorException(), '500 SERVER ERROR');
                 return;
             }
@@ -84,12 +99,11 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
             $this->_error(new ServerErrorException(), $exception->getPrevious() ?? $exception);
             return;
         }
-
     }
 
     protected static function _analysis(...$params) : void {
-        [self::$_connection, $data] = $params;
-        [self::$_exception, $buffer] = (array)$data;
+        [self::$_connection, self::$_data] = $params;
+        [self::$_exception, $buffer] = JsonRpc2::request((array)self::$_data);
         self::$_jsonFormat = JsonFmt::factory((array)$buffer);
         self::$_params = self::$_jsonFormat->params;
     }
@@ -98,16 +112,16 @@ class RpcServer extends AbstractProcess implements ListenerInterface{
         $errorFmt = ErrorFmt::factory();
         $errorFmt->code    = $exception->getCode();
         $errorFmt->message = $exception->getMessage();
-        if($info instanceof \Throwable){
-            $info = self::$_debug ? [
-                '_code'    => $exception->getCode(),
-                '_message' => $exception->getMessage(),
-                '_file'    => $exception->getFile() . '(' .$exception->getLine(). ')',
-                '_trace'   => $exception->getTraceAsString(),
-                '_info'    => $exception instanceof ServiceErrorException ? $exception->getInfo() : []
+        if($info instanceof ServiceErrorException){
+            $info = DEBUG ? [
+                '_code'    => $info->getCode(),
+                '_message' => $info->getMessage(),
+                '_file'    => $info->getFile() . '(' .$info->getLine(). ')',
+                '_trace'   => $info->getTraceAsString(),
+                '_info'    => $info->getInfo()
             ] : [
-                '_code'    => $exception->getCode(),
-                '_message' => $exception->getMessage(),
+                '_code'    => $info->getCode(),
+                '_message' => $info->getMessage(),
             ];
         }
         $errorFmt->data = $info ?? null;

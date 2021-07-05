@@ -11,13 +11,13 @@ define('ROOT_PATH'  , dirname(__DIR__));
 require_once ROOT_PATH . '/vendor/autoload.php';
 
 $start = getCurrentTime();
-$client = \JsonRpc\RpcClient::instance([HOST]);
+$client = \CasualMan\Common\Internal\RpcClient::instance([HOST]);
 $v = $client->call('@demo',
     [
         'unique_tag'  => 'test-a',
         'beneficiary' => 'test-a',
     ],
-    \JsonRpc\RpcClient::uuid()
+    \CasualMan\Common\Internal\RpcClient::uuid()
 );
 
 dump($v);

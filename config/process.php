@@ -10,7 +10,7 @@ return [
     'rpc_server' => [
         'handler'    => \CasualMan\Common\Process\RpcServer::class,
         'listen'     => 'JsonRpc2://0.0.0.0:5454',
-        'count'      => 4,
+        'count'      => 2,
         'reuse_port' => true,
         'reloadable' => true
     ]
