@@ -6,7 +6,7 @@
     "ext-pdo": "*",
     "casual/framework": "^2.0",
     "symfony/var-dumper": "^5.2",
-    "casual/database": "^1.0",
+    "casual/database": "^2.0",
     "casual/utils": "^1.0"
   },
   "license": "MIT",
@@ -23,7 +23,8 @@
   },
   "scripts": {
     "post-autoload-dump": [
-      "@php -r \"file_exists('bin/.env') || copy('.env.example', 'bin/.env');\""
+      "@php -r \"file_exists('bin/.env') || copy('.env.example', 'bin/.env');\"",
+      "@php -r \"is_dir('runtime') || mkdir('runtime');\""
     ]
   }
 }
