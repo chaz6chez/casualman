@@ -4,6 +4,7 @@
   "require": {
     "php": ">=7.3",
     "ext-pdo": "*",
+    "ext-json": "*",
     "casual/framework": "^2.0",
     "symfony/var-dumper": "^5.2",
     "casual/database": "^2.0",
