@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace CasualMan\Common\Internal;
 
@@ -14,285 +15,155 @@ use Utils\JsonRpc2\Format\ErrorFmt;
 use Utils\JsonRpc2\Format\JsonFmt;
 use Protocols\JsonRpc2;
 
-class RpcClient {
-
-    /**
-     * @var int 发送数据和接收数据的超时时间  单位S
-     */
-    const TIME_OUT = 5;
-
+class RpcClient
+{
     /**
      * @var array 服务端地址
      */
-    protected static $_addressArray = [];
+    protected static array $_address = [];
 
-    /**
-     * @var string 异步调用实例
-     */
-    protected static $_asyncInstances = [];
     /**
      * @var RpcClient 同步调用实例
      */
     protected static $_instances = null;
     /**
-     * @var resource 服务端的socket连接
+     * @var resource|null 服务端的socket连接
      */
-    protected $_connection = null;
-    protected $_id         = null; # 实例id
-    protected $_async_id   = null; # 上一个激活的异步客户端id
+    protected $_socket = null;
+
+    /**
+     * @var int 连接超时时间
+     */
+    protected $_connectTimeout;
+    /**
+     * @var int 请求超时时间
+     */
+    protected $_requestTimeout;
+
     protected $_prepares   = false;
-    protected $_buffer     = null;
-    protected $_timeout    = self::TIME_OUT;
 
     /**
      * RpcClient constructor.
      * @param array $address
+     * @param int $timeout
      */
-    protected function __construct(array $address) {
-        if($address){
-            self::$_addressArray = $address;
-        }
+    protected function __construct(array $address, int $timeout) {
+        self::$_address = $address;
+        $this->_connectTimeout = $timeout;
     }
 
     /**
-     * @param array $address
-     * @return static
+     * @return null|int
      */
-    public static function factory(array $address = []){
-        return new static($address);
+    public function getConnectTimeout(): ?int
+    {
+        return $this->_connectTimeout;
     }
 
     /**
-     * @param array $address
-     * @return RpcClient
+     * @return int
      */
-    public static function instance(array $address = []) {
-
-        if(!static::$_instances or !static::$_instances instanceof RpcClient) {
-            static::$_instances = new static($address);
-        }
-        return self::$_instances;
-    }
-
-    public static function getInstance(){
-        return self::$_instances;
-    }
-
-    public static function getAsyncInstance(){
-        return self::$_asyncInstances;
+    public function getTimeout(): int
+    {
+        return $this->_requestTimeout;
     }
 
     /**
-     * 设置是否本地预处理服务器返回值
-     * @param bool $prepares
+     * @param int $requestTimeout
      * @return $this
      */
-    public function prepares(bool $prepares){
-        $this->_prepares = $prepares;
+    public function setTimeout(int $requestTimeout = 90) : RpcClient
+    {
+        $this->_requestTimeout = $requestTimeout;
+        stream_set_timeout($this->_socket, $this->getTimeout());
         return $this;
     }
 
-    /**
-     * 获取缓冲区数据
-     * @return string
-     */
-    public function getBuffer(){
-        return $this->_buffer;
-    }
 
     /**
-     * 设置缓冲区数据
-     * @param $buffer
-     */
-    public function setBuffer($buffer){
-        $this->_buffer = $buffer;
-    }
-
-    /**
-     * 获取超时时间
-     * @return string
-     */
-    public function getTimeout(){
-        return $this->_timeout;
-    }
-
-    /**
-     * 设置超时时间
-     * @param int $time
-     */
-    public function setTimeout(int $time){
-        $this->_timeout = $time;
-    }
-
-    /**
-     * @param string $method
-     * @param array $arguments
-     * @param string $id
-     * @return array
-     *
-     * return[0] = key            asyncRecv的必要入参，key = method:id
-     *
-     * return[1] = JsonEmt.object 表示有异常
-     *             false          表示连接失败
-     *             true           表示成功
-     *
-     * @throws MethodAlreadyException
-     */
-    public function asyncSend(string $method, array $arguments, $id) {
-        $key = "{$method}:{$id}";
-        if(
-            isset(static::$_asyncInstances[$key]) and
-            static::$_asyncInstances[$key] instanceof RpcClient
-        ) {
-            throw new MethodAlreadyException($key);
-        }
-        $async = static::$_asyncInstances[$key] = static::factory(static::$_addressArray);
-        $this->_async_id                        = $key;
-
-        return $this->_res(
-            $async->_sendData($method, $arguments, $id),
-            $key
-        );
-    }
-
-    /**
-     * @param string $key
-     * @return array
-     *
-     * return[0] = tag            bool|null
-     *                            true:  成功
-     *                            false: 内部错误|连接错误
-     *                            null:  jsonRpc-2.0协议错误
-     *
-     * return[1] = data           array 数据
-     *
-     * @throws MethodNotReadyException
-     */
-    public function asyncRecv($key) {
-        if(
-            isset(self::$_asyncInstances[$key]) and
-            (($async = self::$_asyncInstances[$key]) instanceof RpcClient)
-        ){
-            $res = $async->_recvData();
-            $async->close();
-            self::$_asyncInstances[$key] = null;
-            $this->_async_id = ($this->_async_id === $key) ? null : $this->_async_id;
-            if($res === false){
-                return $this->_res(['connection error -> async_recv'],false);
-            }
-            if($res instanceof JsonFmt){
-                return $this->_res($res->outputArray(),null);
-            }
-            return $this->_res($res, true);
-        }
-        throw new MethodNotReadyException($key);
-    }
-
-    /**
-     * 异步通知发送
-     * @param string $method
-     * @param array $arguments
-     * @return array
-     *
-     * return[0] = JsonEmt.object 表示有异常
-     *             false          表示连接失败
-     *             true           表示成功
-     *
-     * return[1] = data
-     */
-    public function asyncNoticeSend(string $method, array $arguments) {
-        $async = self::instance(self::$_addressArray);
-        return $this->_res(
-            null,
-            $async->_sendData( $method, $arguments)
-        );
-    }
-
-    /**
-     * 同步
-     * @param string $method
-     * @param array $arguments
-     * @param string $id
-     * @return array
-     *
-     * return[0] = tag            bool|null
-     *                            true:  成功
-     *                            false: 内部错误|连接错误
-     *                            null:  jsonRpc-2.0协议错误
-     *
-     * return[1] = data           array 数据
-     *
-     */
-    public function call(string $method, array $arguments, $id = '') {
-        $res = $this->_sendData($method, $arguments, $id);
-        if($res === false){
-            return $this->_res(['connection error -> send'],false);
-        }
-        if($res instanceof JsonFmt){
-            return $this->_res($res->outputArray(),null);
-        }
-
-        if($id === ''){
-            $this->close();
-            return $this->_res($res, true);
-        }
-        $res = $this->_recvData();
-        $this->close();
-        if($res === false){
-            return $this->_res(['connection error -> recv'],false);
-        }
-        if($res instanceof JsonFmt){
-            return $this->_res($res->outputArray(),null);
-        }
-        return $this->_res($res, true);
-    }
-
-    /**
-     * 发送
-     * @param string $json
+     * @param array $address
      * @param int $timeout
-     * @return bool
+     * @return RpcClient
      */
-    public function send(string $json, $timeout = 5) {
-        try {
-            $this->setTimeout($timeout);
-            return boolval(fwrite($this->_openConnection( true), $json) !== strlen($json));
-        }catch(ConnectException $connectException){
-            return false;
-        }catch(\Exception $exception){
-            return false;
+    public static function instance(array $address = [], int $timeout = 5) :RpcClient
+    {
+
+        if(!static::$_instances or !static::$_instances instanceof RpcClient) {
+            static::$_instances = new static($address, $timeout);
         }
+        return self::$_instances;
     }
 
     /**
-     * 获取
-     * @param bool $close
-     * @return array
+     * @return resource|null
+     * @throws ConnectException
      */
-    public function get($close = true){
-        $res = [];
-        while($this->_buffer = fgets($this->_connection)){
-            $res[] = $this->_buffer;
+    protected function _connection()
+    {
+        if(
+            !$this->_socket or
+            !is_resource($this->_socket)
+        ){
+            $res = @stream_socket_client(
+                self::$_address[array_rand(self::$_address)],
+                $err_no,
+                $err_msg,
+                $this->getConnectTimeout()
+            );
+            if(!$res or $err_no){
+                throw new ConnectException();
+            }
+            $this->_socket = $res;
         }
-        if($close){
-            $this->close();
-        }
-        return $res;
+        stream_set_blocking($this->_socket, true);
+        $this->setTimeout();
+        return $this->_socket;
     }
 
     /**
      * 关闭连接
      */
     public function close(){
-        $this->_closeConnection();
+        if(is_resource($this->_socket)){
+            @fclose($this->_socket);
+        }
+        $this->_socket = null;
     }
 
     /**
-     * @param mixed $data 数据
-     * @param bool|string $tag 标记
+     * @param string $method
+     * @param array $arguments
+     * @param string|null $id
+     * @return array [tag, data]
+     *               true:  成功
+     *               false: 失败
+     */
+    public function call(string $method, array $arguments, ?string $id = null) :array
+    {
+        $res = $this->send($method, $arguments, $id);
+        if($res){
+            return $this->_res(false,$res);
+        }
+        if($id){
+            $res = $this->get();
+            if(
+                is_array($res) and
+                isset($res['error']['data']) and
+                $res['error']['data']=== '<get>'
+            ){
+                return $this->_res(false,$res);
+            }
+        }
+        return $this->_res(true,$res);
+    }
+
+    /**
+     * @param $tag
+     * @param array|null $data
      * @return array
      */
-    protected function _res($data, $tag){
+    protected function _res($tag, ?array $data) :array
+    {
         return [
             $tag,
             $data
@@ -300,124 +171,76 @@ class RpcClient {
     }
 
     /**
-     * 发送数据给服务端
-     * @param $method
-     * @param $arguments
-     * @param $id
-     * @return bool|JsonFmt
-     *
-     * JsonEmt.object 表示有异常
-     * false          表示连接失败
-     * true           表示成功
+     * 发送
+     * @param string $data
+     * @return false|int
+     * @throws ConnectException
      */
-    protected function _sendData(string $method, array $arguments, $id = '') {
+    public function sendRaw(string $data) {
+        return fwrite($this->_connection(), $data, strlen($data));
+    }
+
+    /**
+     * 获取
+     * @return false|string
+     * @throws ConnectException
+     */
+    public function getRaw() {
+        return fgets($this->_connection());
+    }
+
+    /**
+     * @param string $method
+     * @param array $arguments
+     * @param string $id
+     * @return array|null
+     *  null success
+     *  array 协议错误/连接错误/发送失败
+     */
+    public function send(string $method, array $arguments, $id = '') :?array
+    {
         $fmt         = JsonFmt::factory();
         $fmt->method = $method;
         $fmt->params = $arguments;
         $fmt->id     = $id ? $id : null;
-        $error       = ErrorFmt::factory();
         try {
-            $json = JsonRpc2::encode($fmt->outputArray($fmt::FILTER_STRICT));
-            # 发送数据
-            if(($a = fwrite($this->_openConnection(), $json)) !== strlen($json)) {
+            $res = $this->sendRaw(
+                JsonRpc2::encode($fmt->filter(STRUCT_FILTER_EMPTY,STRUCT_FILTER_NULL)->output())
+            );
+            if($res === false){
                 throw new InvalidRequestException();
             }
-            return $a;
-        }catch(ConnectException $connectException){
-            return false;
+            return null;
         }catch(RpcException $rpcException){
+            $error       = ErrorFmt::factory();
             $error->code    = $rpcException->getCode();
             $error->message = $rpcException->getMessage();
-            $fmt->error     = $error->outputArray();
-            return $fmt;
-        }catch(\Exception $exception){
-            $serverException = new ServerErrorException();
-            $error->code    = $serverException->getCode();
-            $error->message = $serverException->getMessage();
-            $error->data    = [
-                'message' => $exception->getMessage(),
-                'code'    => $exception->getCode()
-            ];
-            $fmt->error     = $error->outputArray();
-            return $fmt;
+            $error->data    = '<send>';
+            $fmt->error     = $error->output();
+            return $fmt->scene($fmt::TYPE_RESPONSE)->filter(STRUCT_FILTER_KEY_REVERSE)->output();
         }
     }
 
     /**
      * 从服务端接收数据
-     * @return array|bool|JsonFmt
-     *
-     * JsonEmt.object 表示有异常
-     * false          表示连接失败
-     * array          表示成功
+     * @return array
      */
-    protected function _recvData() {
-        $fmt         = JsonFmt::factory();
-        $error       = ErrorFmt::factory();
+    public function get() :array
+    {
+        $fmt = JsonFmt::factory();
         try {
-            if(!is_resource($this->_connection)){
-                return false;
+            if(($buffer = $this->getRaw()) === false){
+                throw new InvalidRequestException();
             }
-            $this->setBuffer(null);
-            $this->setBuffer(fgets($this->_connection));
-
-            if($this->getBuffer() !== "\n"){
-                return JsonRpc2::decode($this->getBuffer(), $this->_prepares);
-            }
-            return [];
-        }catch(ConnectException $connectException){
-            return false;
+            return ($buffer !== PHP_EOL) ? JsonRpc2::decode($buffer, $this->_prepares) : [];
         }catch(RpcException $rpcException){
+            $error       = ErrorFmt::factory();
             $error->code    = $rpcException->getCode();
             $error->message = $rpcException->getMessage();
-            $fmt->error     = $error->outputArray();
-            return $fmt;
-        }catch(\Exception $exception){
-            $serverException = new ServerErrorException();
-            $error->code    = $serverException->getCode();
-            $error->message = $serverException->getMessage();
-            $error->data    = [
-                'message' => $exception->getMessage(),
-                'code'    => $exception->getCode()
-            ];
-            $fmt->error     = $error->outputArray();
-            return $fmt;
+            $error->data    = '<get>';
+            $fmt->error     = $error->output();
+            return $fmt->scene($fmt::TYPE_RESPONSE)->filter(STRUCT_FILTER_KEY_REVERSE)->output();
         }
-    }
-
-    /**
-     * 打开连接
-     * @param bool $mode
-     * @return resource
-     * @throws ConnectException
-     */
-    protected function _openConnection($mode = true) {
-        if(!is_resource($this->_connection)){
-            $this->_connection = @stream_socket_client(
-                self::$_addressArray[array_rand(self::$_addressArray)],
-                $err_no,
-                $err_msg
-            );
-        }
-        if(!$this->_connection or !is_resource($this->_connection)) {
-            throw new ConnectException();
-        }
-        stream_set_blocking($this->_connection, $mode);
-        if($this->getTimeout()){
-            stream_set_timeout($this->_connection, $this->getTimeout());
-        }
-        return $this->_connection;
-    }
-
-    /**
-     * 关闭连接
-     */
-    protected function _closeConnection() {
-        if(is_resource($this->_connection)){
-            fclose($this->_connection);
-        }
-        $this->_connection = null;
-        $this->_id         = null;
     }
 
     /**

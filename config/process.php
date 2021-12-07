@@ -1,17 +1,18 @@
 <?php
 return [
-//    'name' => [
-//        'handler'    => \Internal\Kernel\AbstractProcess::class,
-//        'listen'     => 'jsonRpc://0.0.0.0:5454',
-//        'count'      => 4,
-//        'reuse_port' => true,
-//        'reloadable' => true
-//    ],
     'rpc_server' => [
         'handler'    => \CasualMan\Common\Process\RpcServer::class,
-        'listen'     => 'JsonRpc2://0.0.0.0:5454',
-        'count'      => 2,
+        'listen'     => 'JsonRpc2://[::]:5454',
+        'count'      => DEBUG ? 2 : 16,
         'reuse_port' => true,
-        'reloadable' => true
+        'reloadable' => true,
+    ],
+    'http_server' => [
+        'handler'    => \CasualMan\Common\Process\HttpServer::class,
+        'listen'     => 'Http://[::]:6464',
+        'count'      => DEBUG ? 2 : 4,
+        'reuse_port' => true,
+        'reloadable' => true,
+        'transfer'   => '127.0.0.1:5454'
     ]
 ];

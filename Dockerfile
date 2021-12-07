@@ -1,4 +1,4 @@
-FROM php:7.3.28-alpine3.13
+FROM php:7.4.26-fpm-alpine3.13
 LABEL maintainer="250220719@qq.com" version="1.0.0"
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     apk update && \
@@ -20,8 +20,7 @@ RUN apk add --no-cache \
     e2fsprogs-dev && \
     pecl install uuid && \
     docker-php-ext-enable uuid
-    
+
 EXPOSE 5454 6464
-CMD ["top"]
 VOLUME /var/www
 WORKDIR /var/www

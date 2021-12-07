@@ -4,13 +4,27 @@ declare(strict_types=1);
 ini_set('date.timezone','Asia/Shanghai');
 define('ROOT_PATH'  , dirname(__DIR__));
 require_once ROOT_PATH . '/vendor/autoload.php';
+require_once ROOT_PATH . '/helpers.php';
 
 use Kernel\ApplicationFactory;
+use Psr\Log\LoggerInterface;
+use Kernel\Middlewares;
 
 try{
-    (new ApplicationFactory())('CASUAL-MAN','0.0.1', function(){
-        Co()->get(\Kernel\Middlewares::class)->init('CASUAL-MAN');
+    (new ApplicationFactory())('CASUAL-MAN','2.0.0', function(){
+        // 中间件
+        Co()->get(Middlewares::class)->init('3Y-CLEARING-CENTER');
+        // 注册错误收集
+        debug_helper(function (){
+            set_error_handler(function (...$params){
+                /** @var ?LoggerInterface $logger */
+                $logger = C('logger',null);
+                if($logger){
+                    $logger->debug('DEBUG-error_handler',$params);
+                }
+            },E_ALL);
+        });
     })->run();
 }catch(Throwable $throwable){
-    exit($throwable->getMessage());
+    exit("{$throwable->getMessage()}|{$throwable->getCode()}" . PHP_EOL);
 }

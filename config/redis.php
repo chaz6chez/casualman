@@ -2,7 +2,7 @@
 return [
     'default' => [
         'host'       => E('redis.host'),
-        'port'       => E('redis.port'),
+        'port'       => (int)E('redis.port'),
         'password'   => E('redis.password'),
         'select'     => E('redis.database'),
         'timeout'    => 2.5,   # 秒为单位

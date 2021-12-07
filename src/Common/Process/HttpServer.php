@@ -3,110 +3,150 @@ declare(strict_types=1);
 
 namespace CasualMan\Common\Process;
 
+use Kernel\ApplicationFactory;
 use Kernel\Routers\HttpRouter;
+use Psr\Log\LoggerInterface;
 use Kernel\AbstractProcess;
 use Kernel\Protocols\ListenerInterface;
 use Workerman\Connection\TcpConnection;
-use Workerman\Protocols\Http\Request;
-use RuntimeException;
-use Workerman\Protocols\Http\Response;
+use Workerman\Protocols\Http;
 
 class HttpServer extends AbstractProcess implements ListenerInterface
 {
-    /**
-     * @var TcpConnection
-     */
+    /** @var TcpConnection|null */
     protected static $_connection;
 
-    /**
-     * @var Request
-     */
+    /** @var Http\Request|null */
     protected static $_request;
 
-    /**
-     * @var Response
-     */
-    protected static $_response;
+    /** @var int|null */
+    protected static $_start;
 
-    /**
-     * @return TcpConnection|null
-     */
+    /** @var LoggerInterface|null */
+    protected $_logger;
+
+    /** @var callable|null */
+    protected $_before;
+
+    /** @var callable|null */
+    protected $_after;
+
     public static function connection() : ?TcpConnection
     {
         return self::$_connection;
     }
 
-    /**
-     * @param TcpConnection $connection
-     */
-    public static function setConnection(TcpConnection $connection) : void
-    {
-        self::$_connection = $connection;
-    }
-
-    /**
-     * @return Request|null
-     */
-    public static function request(): ?Request
+    public static function request() : ?Http\Request
     {
         return self::$_request;
     }
 
-    /**
-     * @param Request $request
-     */
-    public static function setRequest(Request $request): void
+    public function onStart(...$param): void
     {
-        self::$_request = $request;
+        if(!$this->_logger instanceof LoggerInterface)
+        {
+            /** @var LoggerInterface _logger */
+            $this->_logger = C('logger');
+        }
     }
 
-    /**
-     * @return Response
-     */
-    public static function response(): Response
+    public function onStop(...$param): void
     {
-        self::$_response = new Response();
-        self::$_response->header('Server','Casual-Man');
-        self::$_response->withStatus(200);
-        return self::$_response;
+        $this->_logger = null;
     }
 
-    public function onStart(...$param): void {} //TODO 资源初始化
     public function onReload(...$param): void {}
-    public function onStop(...$param): void {} //TODO 资源释放
-    public function onBufferDrain(...$params) : void {} //TODO 记录日志
-    public function onBufferFull(...$params) : void {} //TODO 记录日志
-    public function onClose(...$params) : void {}
-    public function onConnect(...$params) : void {}
-    public function onError(...$params) : void {} //TODO 记录日志
 
-    public function onMessage(...$params) : void {
-        self::setConnection($params[0]);
-        self::setRequest($params[1]);
+    public function onBufferDrain(...$params) : void
+    {
+        $this->_logger->notice(__METHOD__,$params ?? []);
+    }
+
+    public function onBufferFull(...$params) : void
+    {
+        $this->_logger->notice(__METHOD__,$params ?? []);
+    }
+
+    public function onClose(...$params) : void
+    {
+        $this->_clean();
+    }
+
+    public function onConnect(...$params) : void {}
+
+    public function onError(...$params) : void {
+        $this->_logger->notice(__METHOD__,$params ?? []);
+    }
+
+    public function onMessage(...$params) : void
+    {
+        $this->_init(...$params);
+
         try {
             if(!$result = HttpRouter::dispatch(
                 self::request()->method(),
                 self::request()->path()
-            )){
-                throw new RuntimeException('SERVER ERROR', 500);
-            }
-            if(self::request()->header('connection') !== 'keep-alive'){
-                self::connection()->close($result);
-            }else{
-                self::connection()->send($result);
+            ) or (!$result instanceof Http\Response)){
+                throw new \RuntimeException('Server Error[internal]', 500);
             }
             return;
-        }catch (\Throwable $exception){
-            $response = self::response();
-            $response->header('Content-Type','application/json');
-            $response->withStatus($exception->getCode());
-            $response->withBody(json_encode([
-                'status' => -1,
-                'code'   => $exception->getCode(),
-                'message'=> $exception->getMessage()
-            ],JSON_UNESCAPED_UNICODE));
-            self::connection()->close($response);
+        }catch (\Exception $exception){
+            switch ($exception->getCode()){
+                case 403:
+                case 404:
+                    $result = new Http\Response();
+                    $result->withStatus($exception->getCode());
+                    $result->withBody(
+                        json_encode(["{$exception->getCode()} {$exception->getMessage()}"],JSON_UNESCAPED_UNICODE)
+                    );
+                    break;
+                default:
+                    $result = new Http\Response();
+                    $result->withStatus(500);
+                    $result->withBody(
+                        json_encode(["500 {$exception->getMessage()}"],JSON_UNESCAPED_UNICODE)
+                    );
+                    break;
+            }
+            return;
+        } finally {
+            if(!$result->getHeader('Content-Type')){
+                $result->header('Content-Type', 'application/json');
+            }
+            $result->header('Connection', self::request()->header('Connection'));
+            $result->header('Server', ApplicationFactory::$name);
+            $result->header('Version', ApplicationFactory::$version);
+            $this->_response($result);
             return;
         }
+    }
+
+    protected function _init(...$params) : void
+    {
+        self::$_start  = microtime(true);
+        list(self::$_connection, self::$_request) = $params;
+
+        if(is_callable($this->_before)){
+            ($this->_before)($this);
+        }
+    }
+
+    protected function _response(Http\Response $buffer) : void
+    {
+        if(DEBUG){
+            $buffer->header('Duration', microtime(true) - self::$_start);
+        }
+        (self::request()->header('Connection') === 'keep-alive')
+            ? self::connection()->send($buffer)
+            : self::connection()->close($buffer);
+
+        if(is_callable($this->_after)){
+            ($this->_after)($this);
+        }
+    }
+
+    protected function _clean() : void {
+        self::$_connection = null;
+        self::$_request = null;
     }
 }

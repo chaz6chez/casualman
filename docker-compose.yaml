@@ -1,15 +1,36 @@
 version: '3'
 services:
-  clearing_center:
+  clearing-center:
     restart: always
-    container_name: casualman
+    container_name: clearing-php
     build:
       context: ./
-    image: casualman
+    image: 3y-php
+    links:
+      - clearing-rabbitmq
+      - clearing-redis
     ports:
       - 5454:5454
       - 6464:6464
     volumes:
-      - ../casualman:/var/www
-    stdin_open: true
+      - /project/www/:/var/www
     tty: true
+
+  clearing-rabbitmq:
+    restart: always
+    container_name: clearing-rabbitmq
+    image: rabbitmq:3.8.23-management-alpine
+    ports:
+      - 5671:5671
+      - 5672:5672
+      - 15671:15671
+      - 15672:15672
+    volumes:
+      - /project/rabbitmq/:/var/log/rabbitmq/
+
+  clearing-redis:
+    restart: always
+    container_name: clearing-redis
+    image: redis:6.2.6-alpine
+    ports:
+      - 6379:6379

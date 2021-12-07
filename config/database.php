@@ -1,11 +1,11 @@
 <?php
+
 return [
     'mysql' => [
         'demo' => [
             'driver'   => 'mysql',
             'host'     => E('mysql.host'),
             'port'     => E('mysql.port'),
-            'dsn'      => '',
             'username' => E('mysql.username'),
             'password' => E('mysql.password'),
             'charset'  => 'utf8mb4',
@@ -15,13 +15,12 @@ return [
                 PDO::ATTR_TIMEOUT          => 2,
                 PDO::ATTR_EMULATE_PREPARES => false
             ],
-            'prefix'   => E('mysql.prefix'),
             'error'    => PDO::ERRMODE_EXCEPTION,
-            'slave'    => [
+            'prefix'        => E('mysql.prefix'),
+            'slave' => [
                 'driver'   => 'mysql',
                 'host'     => E('mysql.host'),
                 'port'     => E('mysql.port'),
-                'dsn'      => '',
                 'username' => E('mysql.username'),
                 'password' => E('mysql.password'),
                 'charset'  => 'utf8mb4',
@@ -31,17 +30,9 @@ return [
                     PDO::ATTR_TIMEOUT          => 2,
                     PDO::ATTR_EMULATE_PREPARES => false
                 ],
-                'prefix'   => E('mysql.prefix'),
                 'error'    => PDO::ERRMODE_EXCEPTION,
+                'prefix'        => E('mysql.prefix'),
             ]
-        ],
-    ],
-    'mongodb' => [
-        '3y_clearing' => [
-            'host'     => E('mongodb.host'),
-            'port'     => E('mongodb.port'),
-            'username' => E('mongodb.username'),
-            'password' => E('mongodb.port'),
         ]
     ]
 ];
