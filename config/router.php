@@ -1,2 +1,2 @@
 <?php
-\CasualMan\Clearing\Routes\DemoRouter::register();
+\CasualMan\Application\Routes\DemoRouter::register();

@@ -2,8 +2,8 @@
 
 return [
     '3Y-CLEARING-CENTER' => [
-        DEBUG ? Co()->get(\CasualMan\Clearing\Middleware\DebugSQLMiddleware::class) : null,
-        Co()->get(\CasualMan\Clearing\Middleware\RateLimitMiddleware::class),
-        Co()->get(\CasualMan\Clearing\Middleware\ServerErrorCatchMiddleware::class),
+        DEBUG ? Co()->get(\CasualMan\Application\Middleware\DebugSQLMiddleware::class) : null,
+        Co()->get(\CasualMan\Application\Middleware\RateLimitMiddleware::class),
+        Co()->get(\CasualMan\Application\Middleware\ServerErrorCatchMiddleware::class),
     ]
 ];
