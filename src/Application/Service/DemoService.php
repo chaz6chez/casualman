@@ -1,5 +1,5 @@
 <?php
-namespace CasualMan\Clearing\Service;
+namespace CasualMan\Application\Service;
 
 use Kernel\Utils\Service;
 use Kernel\Utils\Response;

@@ -1,5 +1,5 @@
 <?php
-namespace CasualMan\Clearing\Error;
+namespace CasualMan\Application\Error;
 
 class ErrorCode {
 

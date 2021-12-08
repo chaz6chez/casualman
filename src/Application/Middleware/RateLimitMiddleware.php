@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Middleware;
+namespace CasualMan\Application\Middleware;
 
-use CasualMan\Clearing\Error\ErrorCode;
-use CasualMan\Clearing\RateLimit\ClearingRateLimit;
+use CasualMan\Application\Error\ErrorCode;
+use CasualMan\Application\RateLimit\ClearingRateLimit;
 use CasualMan\Common\Internal\AbstractController;
 use Kernel\Protocols\MiddlewareInterface;
 

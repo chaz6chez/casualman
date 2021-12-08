@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Middleware;
+namespace CasualMan\Application\Middleware;
 
-use CasualMan\Clearing\Controller\Controller;
+use CasualMan\Application\Controller\Controller;
 use CasualMan\Common\Internal\AbstractController;
 use Utils\Context;
 use Database\Driver;

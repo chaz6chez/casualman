@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\RateLimit;
+namespace CasualMan\Application\RateLimit;
 
 use CasualMan\Common\Internal\RateLimit\AbstractRate;
 use CasualMan\Common\Process\RpcServer;

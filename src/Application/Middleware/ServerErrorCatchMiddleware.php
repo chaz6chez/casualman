@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Middleware;
+namespace CasualMan\Application\Middleware;
 
-use CasualMan\Clearing\Controller\RpcController;
+use CasualMan\Application\Controller\RpcController;
 use Kernel\Protocols\MiddlewareInterface;
 
 class ServerErrorCatchMiddleware implements MiddlewareInterface {

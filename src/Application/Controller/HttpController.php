@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace CasualMan\Clearing\Controller;
+namespace CasualMan\Application\Controller;
 
-use CasualMan\Clearing\Error\ErrorCode;
+use CasualMan\Application\Error\ErrorCode;
 use CasualMan\Common\Internal\AbstractController;
 use CasualMan\Common\Process\HttpServer;
 use Utils\Context;

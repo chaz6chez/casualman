@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Routes;
+namespace CasualMan\Application\Routes;
 
-use CasualMan\Clearing\Controller\RpcDemo;
+use CasualMan\Application\Controller\RpcDemo;
 use CasualMan\Common\Internal\AbstractRouters;
 use Kernel\Router;
 

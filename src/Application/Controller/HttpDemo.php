@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Controller;
+namespace CasualMan\Application\Controller;
 
 
-use CasualMan\Clearing\Service\DemoService;
+use CasualMan\Application\Service\DemoService;
 
 class HttpDemo extends RpcController {
 

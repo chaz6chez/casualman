@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Clearing\Model;
+namespace CasualMan\Application\Model;
 
 use Database\AbstractModel;
 
