@@ -15,8 +15,6 @@ abstract class AbstractRate {
      */
     protected $_driver;
     protected $_config; //rate.php 配置
-    protected $_qos;    //每秒钟频次
-    protected $_capacity;   //水桶容量
 
     abstract public function key(): string;
 
@@ -31,9 +29,14 @@ abstract class AbstractRate {
         if(!$this->isEnable()){
             throw new \RuntimeException("Not Found {$this->key()} Rate Service");
         }
-        $this->_qos = isset($this->_config['qos']) ? (int)$this->_config['qos'] : null;
-        $this->_capacity = isset($this->_config['capacity']) ? (int)$this->_config['capacity'] : null;
-        $this->_driver = make(SimpleTokenBucket::class, $this->key(), $this->_capacity, $this->_qos);
+        $qos = isset($this->_config['qos']) ? (int)$this->_config['qos'] : null;
+        $capacity = isset($this->_config['capacity']) ? (int)$this->_config['capacity'] : null;
+        $interval = isset($this->_config['interval']) ? (int)$this->_config['interval'] : null;
+
+        $this->_driver = make(SimpleTokenBucket::class, $this->key(), $capacity, $qos);
+        if($interval){
+            $this->_driver->setTimestamp($interval);
+        }
     }
 
     final public function health() : int
