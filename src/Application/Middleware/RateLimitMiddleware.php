@@ -16,10 +16,11 @@ class RateLimitMiddleware implements MiddlewareInterface
         /** @var AbstractController $controller */
         $controller = G($param, AbstractController::class);
         if($controller){
-            if (Co()->get(ClearingRateLimit::class)->limit()) {
-                return $next(...$param);
-            } else {
+            $limit = make(ClearingRateLimit::class)->limit();
+            if ($limit === false) {
                 return $controller->error(ErrorCode::INTERFACE_OVERCLOCK);
+            } else {
+                return $next(...$param);
             }
         }
         return $next(...$param);

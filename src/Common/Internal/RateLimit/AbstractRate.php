@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace CasualMan\Common\Internal\RateLimit;
 
 abstract class AbstractRate {
+
     const BASE_KEY = '#BASE';
 
     const RED = -1;
@@ -14,26 +15,20 @@ abstract class AbstractRate {
      * @var SimpleTokenBucket
      */
     protected $_driver;
-    protected $_config; //rate.php 配置
 
     abstract public function key(): string;
 
-    final public function isEnable(): bool
-    {
-        return !boolval($this->_config === []);
-    }
-
     final public function __construct()
     {
-        $this->_config = C('rate.' . $this->key(), C('rate.' . self::BASE_KEY, []));
-        if(!$this->isEnable()){
+        $config = C('rate.' . $this->key(), C('rate.' . self::BASE_KEY, []));
+        if(!$config){
             throw new \RuntimeException("Not Found {$this->key()} Rate Service");
         }
-        $qos = isset($this->_config['qos']) ? (int)$this->_config['qos'] : null;
-        $capacity = isset($this->_config['capacity']) ? (int)$this->_config['capacity'] : null;
-        $interval = isset($this->_config['interval']) ? (int)$this->_config['interval'] : null;
+        $qos = isset($config['qos']) ? (int)$config['qos'] : null;
+        $capacity = isset($config['capacity']) ? (int)$config['capacity'] : null;
+        $interval = isset($config['interval']) ? (int)$config['interval'] : null;
 
-        $this->_driver = make(SimpleTokenBucket::class, $this->key(), $capacity, $qos);
+        $this->_driver = (Co()->get(SimpleTokenBucket::class))($this->key(), $capacity, $qos);
         if($interval){
             $this->_driver->setTimestamp($interval);
         }
@@ -54,6 +49,6 @@ abstract class AbstractRate {
 
     final public function limit(): ?bool
     {
-        return ($this->_driver)();
+        return $this->_driver->get();
     }
 }
