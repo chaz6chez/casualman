@@ -16,12 +16,12 @@
     "casual/framework": "^2.0",
     "casual/utils": "^2.0",
     "casual/database": "^2.1",
-    "symfony/var-dumper": "^5.2",
     "guzzlehttp/guzzle": "^7.3",
     "monolog/monolog": "^2.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.0"
+    "phpunit/phpunit": "^9.0",
+    "symfony/var-dumper": "^5.2"
   },
   "autoload": {
     "psr-4": {
