@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal;
+namespace CasualMan\Common;
 
 use Utils\JsonRpc2\Exception\ConnectException;
 use Utils\JsonRpc2\Exception\InternalErrorException;

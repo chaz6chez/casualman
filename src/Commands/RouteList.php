@@ -10,9 +10,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Routes extends Command
+class RouteList extends Command
 {
-    protected static $defaultName = 'routes';
+    protected static $defaultName = 'route:list';
 
     protected function configure() : void
     {

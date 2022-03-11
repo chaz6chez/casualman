@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal\RateLimit;
+namespace CasualMan\Package\RateLimit;
 
 abstract class AbstractRate {
 
@@ -20,7 +20,7 @@ abstract class AbstractRate {
 
     final public function __construct()
     {
-        $config = C('rate.' . $this->key(), C('rate.' . self::BASE_KEY, []));
+        $config = C('package.rate_limit.config.' . $this->key(), C('package.rate_limit.config.' . self::BASE_KEY, []));
         if(!$config){
             throw new \RuntimeException("Not Found {$this->key()} Rate Service");
         }

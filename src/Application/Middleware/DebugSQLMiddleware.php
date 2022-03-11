@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace CasualMan\Application\Middleware;
 
 use CasualMan\Application\Controller\Controller;
-use CasualMan\Common\Internal\AbstractController;
+use CasualMan\Common\AbstractController;
 use Utils\Context;
 use Database\Driver;
 use Kernel\Protocols\MiddlewareInterface;

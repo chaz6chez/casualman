@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal;
+namespace CasualMan\Package\Redis;
 
-abstract class Driver{
+abstract class Driver
+{
     /**
      * @var \Redis
      */

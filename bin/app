@@ -15,10 +15,7 @@ use Kernel\Middlewares;
 try{
     (new ApplicationFactory())('CASUAL-MAN','2.0.0', function(){
         // 注册命令
-        Commands::register(
-                \CasualMan\Commands\Routes::class,
-            \CasualMan\Commands\CreateModel::class
-        );
+        Commands::register(\CasualMan\Commands\RouteList::class);
         // 中间件
         Co()->get(Middlewares::class)->init('3Y-CLEARING-CENTER');
         // 注册错误收集

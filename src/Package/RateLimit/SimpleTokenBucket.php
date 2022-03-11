@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal\RateLimit;
+namespace CasualMan\Package\RateLimit;
 
 class SimpleTokenBucket extends AbstractTokenBucket
 {

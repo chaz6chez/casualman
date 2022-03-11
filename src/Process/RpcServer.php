@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Process;
+namespace CasualMan\Process;
 
 use Utils\Context;
 use Protocols\JsonRpc2;

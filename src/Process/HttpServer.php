@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Process;
+namespace CasualMan\Process;
 
 use Kernel\ApplicationFactory;
 use Kernel\Routers\HttpRouter;

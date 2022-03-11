@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace CasualMan\Application\Controller;
 
 use CasualMan\Application\Error\ErrorCode;
-use CasualMan\Common\Internal\AbstractController;
-use CasualMan\Common\Process\RpcServer;
+use CasualMan\Common\AbstractController;
+use CasualMan\Process\RpcServer;
 use Utils\JsonRpc2\Exception\ServiceErrorException;
 use Utils\JsonRpc2\Format\JsonFmt;
 

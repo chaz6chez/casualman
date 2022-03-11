@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace CasualMan\Application\Service;
 
-use Kernel\Utils\Service;
 use Kernel\Utils\Response;
 
-class DemoService extends Service {
+class DemoService extends BaseService
+{
 
     public function test() : Response
     {
