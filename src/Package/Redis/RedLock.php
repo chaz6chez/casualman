@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal;
+namespace CasualMan\Package\Redis;
 
 class RedLock
 {
@@ -16,9 +16,9 @@ class RedLock
 
     public function __construct()
     {
-        $this->_servers = C('redis.redlock.servers');
-        $this->_retryDelay = C('redis.redlock.retry_delay', 200);
-        $this->_retryCount = C('redis.redlock.retry_count', 3);
+        $this->_servers = C('package.redis.config.redlock.servers');
+        $this->_retryDelay = C('package.redis.config.redlock.retry_delay', 200);
+        $this->_retryCount = C('package.redis.config.redlock.retry_count', 3);
         $this->_quorum  = min(count($this->_servers), (count($this->_servers) / 2 + 1));
         $this->_initInstances();
     }

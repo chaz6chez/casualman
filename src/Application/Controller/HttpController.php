@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace CasualMan\Application\Controller;
 
 use CasualMan\Application\Error\ErrorCode;
-use CasualMan\Common\Internal\AbstractController;
-use CasualMan\Common\Process\HttpServer;
+use CasualMan\Common\AbstractController;
+use CasualMan\Process\HttpServer;
 use Utils\Context;
 use Workerman\Protocols\Http\Response;
 

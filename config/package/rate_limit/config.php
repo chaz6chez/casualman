@@ -7,7 +7,7 @@
     ]
 */
 return [
-    \CasualMan\Common\Internal\RateLimit\AbstractRate::BASE_KEY => [
+    \CasualMan\Package\RateLimit\AbstractRate::BASE_KEY => [
         'qos'      => 100,
         'capacity' => 500,
         'interval' => 1

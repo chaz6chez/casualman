@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal;
+namespace CasualMan\Common;
 
 use Workerman\Connection\ConnectionInterface;
 

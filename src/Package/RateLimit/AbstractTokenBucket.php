@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal\RateLimit;
+namespace CasualMan\Package\RateLimit;
 
-use CasualMan\Common\Internal\Redis;
+use CasualMan\Package\Redis\Redis;
 use \Redis as BaseRedis;
 use Workerman\Timer;
 

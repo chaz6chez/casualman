@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal;
+namespace CasualMan\Package\Redis;
 
 use Utils\Tools;
 
-class Redis extends Driver {
+class Redis extends Driver
+{
 
     protected $options   = [];
     protected $is_active = null;
@@ -19,7 +20,7 @@ class Redis extends Driver {
      * @param array $options 缓存参数
      */
     public function __construct($options = []) {
-        $this->options = $options ?: C('redis.default');
+        $this->options = $options ?: C('package.redis.config.redis.default');
         if (!$this->handler or !$this->handler instanceof \Redis) {
             $this->handler = new \Redis();
         }

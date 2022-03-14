@@ -6,7 +6,7 @@ namespace CasualMan\Application\Middleware;
 
 use CasualMan\Application\Error\ErrorCode;
 use CasualMan\Application\RateLimit\ClearingRateLimit;
-use CasualMan\Common\Internal\AbstractController;
+use CasualMan\Common\AbstractController;
 use Kernel\Protocols\MiddlewareInterface;
 
 class RateLimitMiddleware implements MiddlewareInterface

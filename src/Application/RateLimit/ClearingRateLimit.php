@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace CasualMan\Application\RateLimit;
 
-use CasualMan\Common\Internal\RateLimit\AbstractRate;
-use CasualMan\Common\Process\RpcServer;
+use CasualMan\Package\RateLimit\AbstractRate;
+use CasualMan\Process\RpcServer;
 
 class ClearingRateLimit extends AbstractRate
 {

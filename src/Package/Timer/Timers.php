@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace CasualMan\Common\Internal\Timer;
+namespace CasualMan\Package\Timer;
 
-use CasualMan\Common\Internal\Cache;
+use Utils\Cache;
 use Workerman\Timer;
 
 class Timers {

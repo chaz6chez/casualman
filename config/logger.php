@@ -1,7 +1,7 @@
 <?php
 
 use Monolog\Handler\StreamHandler;
-use CasualMan\Common\Internal\CoreLogger;
+use CasualMan\Common\CoreLogger;
 
 /** @var CoreLogger $logger */
 $logger = Co()->get(CoreLogger::class);
